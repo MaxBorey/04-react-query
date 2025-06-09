@@ -1,6 +1,6 @@
 import styles from "./SearchBar.module.css";
 import toast from "react-hot-toast";
-import type { SearchBarProps } from "../../types/movie";
+import type { SearchBarProps } from '../../types/types';
 
 export default function SearchBar({ onSubmit }: SearchBarProps) {
   const handleSubmit = (formData: FormData) => {
@@ -23,7 +23,7 @@ export default function SearchBar({ onSubmit }: SearchBarProps) {
         >
           Powered by TMDB
         </a>
-        <form className={styles.form} action={handleSubmit} aria-label="Search movies form">
+        <form className={styles.form} action={handleSubmit} >
           <input
             className={styles.input}
             type="text"

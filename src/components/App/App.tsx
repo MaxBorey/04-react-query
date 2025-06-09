@@ -9,7 +9,6 @@ import ErrorMessage from "../ErrorMessage/ErrorMessage";
 import MovieModal from "../MovieModal/MovieModal";
 import type { Movie } from "../../types/movie";
 import ReactPaginate from 'react-paginate';
-
 import { useQuery, keepPreviousData } from "@tanstack/react-query";
 
 export default function App() {

@@ -1,5 +1,5 @@
 import styles from "./MovieGrid.module.css";
-import type { MovieGridProps } from "../../types/movie";
+import type {MovieGridProps} from '../../types/types'
 
 export default function MovieGrid({ movies, onSelect }: MovieGridProps) {
   return (
