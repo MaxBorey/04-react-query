@@ -57,11 +57,6 @@ export default function App() {
   return (
     <div className={styles.app}>
       <SearchBar onSubmit={updateQuery} />
-      {isLoading && <Loader />}
-      {!isLoading && error && <ErrorMessage />}
-      {!isLoading && !error && (
-        <MovieGrid movies={movies} onSelect={handleMovieSelect} />
-      )}
       
       {totalPages > 1 && !isLoading && !error && (
         <ReactPaginate
@@ -76,11 +71,17 @@ export default function App() {
           previousLabel="←"
         />
       )}
-
+  
+      {isLoading && <Loader />}
+      {!isLoading && error && <ErrorMessage />}
+      {!isLoading && !error && (
+        <MovieGrid movies={movies} onSelect={handleMovieSelect} />
+      )}
+  
       {selectedMovie && (
         <MovieModal movie={selectedMovie} onClose={handleCloseModal} />
       )}
-
+  
       <Toaster
         position="top-center"
         toastOptions={{
