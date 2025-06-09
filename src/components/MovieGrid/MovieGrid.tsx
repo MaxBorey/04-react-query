@@ -1,5 +1,6 @@
 import styles from "./MovieGrid.module.css";
 import type { MovieGridProps } from '../../types/types'
+import ImageWithSkeleton from "../ImageWithSkeleton/ImageWithSkeleton";
 
 export default function MovieGrid({ movies, onSelect }: MovieGridProps) {
   return (
@@ -7,8 +8,7 @@ export default function MovieGrid({ movies, onSelect }: MovieGridProps) {
       {movies.map(movie => (
         <li key={movie.id} onClick={() => onSelect(movie)}>
           <div className={styles.card}>
-            <img
-              className={styles.image}
+            <ImageWithSkeleton
               src={
                 movie.poster_path
                   ? `https://image.tmdb.org/t/p/w500${movie.poster_path}`
