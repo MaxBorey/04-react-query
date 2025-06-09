@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import toast, { Toaster } from "react-hot-toast";
 import styles from "./App.module.css";
 import SearchBar from "../SearchBar/SearchBar";
@@ -17,7 +17,7 @@ export default function App() {
   const [query, setQuery] = useState("");
   const [selectedMovie, setSelectedMovie] = useState<Movie | null>(null);
 
- const {
+  const {
     data,
     isLoading,
     error,
@@ -44,12 +44,23 @@ export default function App() {
   const handleMovieSelect = (movie: Movie) => setSelectedMovie(movie);
   const handleCloseModal = () => setSelectedMovie(null);
 
-  if (!isLoading && data && data.results.length === 0 && query) {
-    toast("No movies found for your request.");
-  }
-  if (error) {
-    toast.error(String(error));
-  }
+  
+  const hasShownNoResultsToast = useRef(false);
+  useEffect(() => {
+    if (!isLoading && data && data.results.length === 0 && query && !hasShownNoResultsToast.current) {
+      toast("No movies found for your request.");
+      hasShownNoResultsToast.current = true;
+    }
+    if (data && data.results.length > 0) {
+      hasShownNoResultsToast.current = false;
+    }
+  }, [isLoading, data, query]);
+
+  useEffect(() => {
+    if (error) {
+      toast.error(String(error));
+    }
+  }, [error]);
 
   return (
     <div className={styles.app}>
