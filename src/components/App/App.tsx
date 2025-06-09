@@ -10,49 +10,46 @@ import MovieModal from "../MovieModal/MovieModal";
 import type { Movie } from "../../types/movie";
 import ReactPaginate from 'react-paginate';
 
+import { useQuery, keepPreviousData } from "@tanstack/react-query";
+
 export default function App() {
-  const [movies, setMovies] = useState<Movie[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(0);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const [query, setQuery] = useState("");
   const [selectedMovie, setSelectedMovie] = useState<Movie | null>(null);
 
-  const handleSearch = async (searchQuery: string, page = 1) => {
-    if (!searchQuery.trim()) return;
-    setIsLoading(true);
-    setError(null);
-    try {
-      const result = await fetchMovies({ query: searchQuery, page });
-      setMovies(result.results);
-      setTotalPages(result.total_pages);
-      setCurrentPage(page);
-      if (result.results.length === 0) {
-        toast("No movies found for your request.");
-      }
-    } catch (err) {
-      const message = String(err);
-      setError(message);
-      toast.error(message);
-      setMovies([]);
-    } finally {
-      setIsLoading(false);
-    }
+ const {
+    data,
+    isLoading,
+    error,
+  } = useQuery({
+    queryKey: ['movies', query, currentPage],
+    queryFn: () => fetchMovies({ query, page: currentPage }),
+    enabled: !!query, 
+    placeholderData: keepPreviousData,
+  });
+
+  const totalPages = data?.total_pages || 0;
+  const movies = data?.results || [];
+
+  const updateQuery = (searchQuery: string) => {
+    setQuery(searchQuery);
+    setCurrentPage(1);
   };
 
   const handlePageChange = (newPage: number) => {
     if (newPage < 1 || newPage > totalPages || newPage === currentPage) return;
-    handleSearch(query, newPage);
-  };
-
-  const updateQuery = (searchQuery: string) => {
-    setQuery(searchQuery);
-    handleSearch(searchQuery, 1);
+    setCurrentPage(newPage);
   };
 
   const handleMovieSelect = (movie: Movie) => setSelectedMovie(movie);
   const handleCloseModal = () => setSelectedMovie(null);
+
+  if (!isLoading && data && data.results.length === 0 && query) {
+    toast("No movies found for your request.");
+  }
+  if (error) {
+    toast.error(String(error));
+  }
 
   return (
     <div className={styles.app}>
@@ -71,17 +68,17 @@ export default function App() {
           previousLabel="←"
         />
       )}
-  
+
       {isLoading && <Loader />}
       {!isLoading && error && <ErrorMessage />}
       {!isLoading && !error && (
         <MovieGrid movies={movies} onSelect={handleMovieSelect} />
       )}
-  
+
       {selectedMovie && (
         <MovieModal movie={selectedMovie} onClose={handleCloseModal} />
       )}
-  
+
       <Toaster
         position="top-center"
         toastOptions={{
