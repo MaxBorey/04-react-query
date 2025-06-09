@@ -8,6 +8,7 @@ import Loader from "../Loader/Loader";
 import ErrorMessage from "../ErrorMessage/ErrorMessage";
 import MovieModal from "../MovieModal/MovieModal";
 import type { Movie } from "../../types/movie";
+import ReactPaginate from 'react-paginate';
 
 export default function App() {
   const [movies, setMovies] = useState<Movie[]>([]);
@@ -61,30 +62,25 @@ export default function App() {
       {!isLoading && !error && (
         <MovieGrid movies={movies} onSelect={handleMovieSelect} />
       )}
+      
       {totalPages > 1 && !isLoading && !error && (
-        <div className={styles.pagination}>
-          <button
-            onClick={() => handlePageChange(currentPage - 1)}
-            disabled={currentPage === 1}
-            className={styles.paginationButton}
-          >
-            Prev
-          </button>
-          <span className={styles.pageInfo}>
-            Page {currentPage} of {totalPages}
-          </span>
-          <button
-            onClick={() => handlePageChange(currentPage + 1)}
-            disabled={currentPage === totalPages}
-            className={styles.paginationButton}
-          >
-            Next
-          </button>
-        </div>
+        <ReactPaginate
+          pageCount={totalPages}
+          pageRangeDisplayed={5}
+          marginPagesDisplayed={1}
+          onPageChange={({ selected }) => handlePageChange(selected + 1)}
+          forcePage={currentPage - 1}
+          containerClassName={styles.pagination}
+          activeClassName={styles.active}
+          nextLabel="→"
+          previousLabel="←"
+        />
       )}
+
       {selectedMovie && (
         <MovieModal movie={selectedMovie} onClose={handleCloseModal} />
       )}
+
       <Toaster
         position="top-center"
         toastOptions={{
