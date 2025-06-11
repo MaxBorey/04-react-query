@@ -1,17 +1,14 @@
+import { Formik, Form, Field } from "formik";
+import * as Yup from "yup";
 import styles from "./SearchBar.module.css";
 import toast from "react-hot-toast";
 import type { SearchBarProps } from '../../types/types';
 
-export default function SearchBar({ onSubmit }: SearchBarProps) {
-  const handleSubmit = (formData: FormData) => {
-    const query = formData.get("query") as string;
-    if (!query?.trim()) {
-      toast.error("Please enter your search query.");
-      return;
-    }
-    onSubmit(query.trim());
-  };
+const SearchSchema = Yup.object().shape({
+  query: Yup.string().trim().required("Please enter your search query."),
+});
 
+export default function SearchBar({ onSubmit }: SearchBarProps) {
   return (
     <header className={styles.header}>
       <div className={styles.container}>
@@ -23,19 +20,40 @@ export default function SearchBar({ onSubmit }: SearchBarProps) {
         >
           Powered by TMDB
         </a>
-        <form className={styles.form} action={handleSubmit} >
-          <input
-            className={styles.input}
-            type="text"
-            name="query"
-            autoComplete="off"
-            placeholder="Search movies..."
-            autoFocus
-          />
-          <button className={styles.button} type="submit">
-            Search
-          </button>
-        </form>
+        <Formik
+          initialValues={{ query: "" }}
+          validationSchema={SearchSchema}
+          onSubmit={(values, { resetForm }) => {
+            const trimmedQuery = values.query.trim();
+            if (!trimmedQuery) {
+              toast.error("Please enter your search query.");
+              return;
+            }
+            onSubmit(trimmedQuery);
+            resetForm();
+          }}
+        >
+          {({ errors, touched }) => (
+            <Form className={styles.form}>
+              <Field
+                className={styles.input}
+                type="text"
+                name="query"
+                autoComplete="off"
+                placeholder="Search movies..."
+                autoFocus
+              />
+              <button className={styles.button} type="submit">
+                Search
+              </button>
+              {errors.query && touched.query && (
+                <div style={{ color: "crimson", marginTop: 6, fontSize: 14 }}>
+                  {errors.query}
+                </div>
+              )}
+            </Form>
+          )}
+        </Formik>
       </div>
     </header>
   );
